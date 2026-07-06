@@ -1,0 +1,223 @@
+TUGAS PRAKTIKUM TERINTEGRASI
+Integrasi Docker, Container Orchestration, dan CI/CD pada Komputer Pribadi
+Cloud Computing
+
+Mata Kuliah	Komputasi Awan (Cloud Computing)
+Pertemuan	14
+Beban Kegiatan	1 Pertemuan Praktikum, 3 SKS (150 menit)
+Bentuk Tugas	Individu atau Kelompok (maksimal 3 mahasiswa)
+Lingkungan	Komputer pribadi, Docker Desktop, GitHub, dan GitHub Actions
+
+Fokus utama tugas adalah integrasi teknologi, bukan kompleksitas aplikasi.
+ 1. Latar Belakang
+Tugas praktikum ini merupakan kegiatan penutup yang mengintegrasikan materi pada Pertemuan 11, 12, dan 13. Mahasiswa memulai dari pemasangan Docker pada komputer pribadi, menjalankan aplikasi dalam container, mengelola layanan menggunakan Docker Compose sebagai bentuk orkestrasi sederhana, kemudian mengotomatisasi pengujian dan proses build melalui GitHub Actions.
+Seluruh kegiatan dirancang agar dapat dilaksanakan tanpa server cloud berbayar dan tanpa Kubernetes. Mahasiswa cukup menggunakan komputer pribadi, Docker Desktop, GitHub, serta GitHub Actions. Dengan pendekatan ini, mahasiswa tetap memperoleh pengalaman utuh mengenai alur aplikasi lokal menuju container dan pipeline otomatis.
+2. Capaian Pembelajaran
+•	Memasang dan memverifikasi Docker pada komputer pribadi.
+•	Membangun Docker image dari aplikasi sederhana.
+•	Menjalankan aplikasi sebagai container dan mengaksesnya melalui browser atau endpoint API.
+•	Mengelola satu atau lebih service secara deklaratif menggunakan Docker Compose.
+•	Menyediakan automated testing sederhana sebagai quality gate.
+•	Membuat pipeline GitHub Actions untuk pengujian dan Docker build.
+•	Membuktikan kondisi pipeline gagal dan pipeline berhasil.
+•	Menjelaskan hubungan antara Docker, container orchestration, dan CI/CD.
+3. Skenario Tugas
+Mahasiswa memilih satu aplikasi secara bebas. Aplikasi dapat berupa proyek baru, tugas mata kuliah lain, proyek yang sudah pernah dibuat, aplikasi web sederhana, REST API, dashboard, backend service, atau sistem informasi kecil. Bahasa pemrograman dan framework dibebaskan.
+Aplikasi tidak harus kompleks. Penilaian lebih menekankan pada kemampuan mahasiswa mengubah aplikasi lokal menjadi aplikasi berbasis container dan menghubungkannya dengan pipeline CI/CD sederhana.
+4. Batasan dan Ketentuan
+•	Dikerjakan pada komputer pribadi masing-masing.
+•	Menggunakan Docker Desktop atau Docker Engine yang setara.
+•	Menggunakan Docker Compose untuk pengelolaan service.
+•	Menggunakan GitHub sebagai repository kode.
+•	Menggunakan GitHub Actions sebagai pipeline CI.
+•	Tidak wajib menggunakan VPS, Kubernetes, atau layanan cloud berbayar.
+•	Minimal terdapat satu aplikasi, satu Dockerfile, satu file Docker Compose, satu automated test, dan satu workflow GitHub Actions.
+•	Repository harus memiliki riwayat commit yang menunjukkan proses pengerjaan.
+5. Alur Praktikum
+5.1 Tahap 1 - Instalasi dan Verifikasi Docker
+Mahasiswa memasang Docker sesuai sistem operasi yang digunakan, kemudian melakukan verifikasi melalui terminal atau command prompt.
+docker --version
+docker compose version
+docker run hello-world
+
+Bukti yang diharapkan: versi Docker tampil, Docker Compose tersedia, dan container hello-world berhasil dijalankan.
+5.2 Tahap 2 - Menyiapkan Aplikasi
+Mahasiswa menyiapkan aplikasi yang dapat dijalankan secara lokal. Struktur folder dapat menyesuaikan teknologi yang digunakan. Struktur minimal yang disarankan:
+nama-proyek/
+├── source-code/
+├── tests/
+├── Dockerfile
+├── docker-compose.yml
+├── README.md
+└── .github/
+    └── workflows/
+        └── ci.yml
+
+5.3 Tahap 3 - Membuat Dockerfile dan Docker Image
+Mahasiswa membuat Dockerfile yang sesuai dengan aplikasi, kemudian membangun image.
+docker build -t aplikasi-mahasiswa:v1 .
+docker images
+
+Dockerfile sekurang-kurangnya memuat base image, working directory, proses instalasi dependency, penyalinan source code, port aplikasi, dan perintah untuk menjalankan aplikasi.
+5.4 Tahap 4 - Menjalankan Container
+Image yang telah dibangun dijalankan sebagai container dan dipetakan ke port lokal.
+docker run -d --name aplikasi-mahasiswa -p 8080:PORT_APLIKASI aplikasi-mahasiswa:v1
+docker ps
+
+Mahasiswa membuka aplikasi melalui browser atau menguji endpoint API. Nomor port disesuaikan dengan aplikasi masing-masing.
+5.5 Tahap 5 - Docker Compose sebagai Orkestrasi Sederhana
+Mahasiswa membuat file docker-compose.yml untuk mendefinisikan service secara deklaratif. Minimal terdapat satu service aplikasi. Penggunaan database sebagai service kedua bersifat nilai tambah.
+services:
+  app:
+    build: .
+    container_name: aplikasi-mahasiswa
+    ports:
+      - "8080:PORT_APLIKASI"
+    restart: unless-stopped
+
+docker compose up -d
+docker compose ps
+docker compose down
+
+Bagian ini mewakili konsep orkestrasi pada skala lokal: definisi service, konfigurasi port, restart policy, dan pengelolaan seluruh service melalui satu perintah.
+5.6 Tahap 6 - Mengunggah Proyek ke GitHub
+Mahasiswa membuat repository GitHub dan mengunggah seluruh proyek. Riwayat commit harus menunjukkan perkembangan pekerjaan, misalnya:
+1.	Menambahkan aplikasi awal.
+2.	Menambahkan Dockerfile.
+3.	Menambahkan Docker Compose.
+4.	Menambahkan automated test.
+5.	Menambahkan workflow GitHub Actions.
+5.7 Tahap 7 - Automated Testing
+Mahasiswa membuat minimal satu pengujian otomatis. Bentuk pengujian dapat berupa pengujian fungsi, endpoint, status HTTP, validasi input, atau pemeriksaan health check.
+Contoh hasil endpoint kesehatan:
+{
+  "status": "healthy"
+}
+
+Mahasiswa wajib membuktikan bahwa pengujian dapat dijalankan secara lokal dengan perintah yang sesuai, misalnya pytest, npm test, atau perintah test dari framework yang digunakan.
+5.8 Tahap 8 - Pipeline GitHub Actions
+Pipeline dibuat sederhana dan minimal menjalankan checkout source code, instalasi dependency jika diperlukan, automated testing, dan Docker build.
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Run automated test
+        run: |
+          echo "Ganti dengan perintah test aplikasi"
+
+      - name: Build Docker image
+        run: |
+          docker build -t aplikasi-mahasiswa:latest .
+
+Mahasiswa menyesuaikan bagian automated test dengan bahasa pemrograman dan framework aplikasi masing-masing.
+5.9 Tahap 9 - Simulasi Pipeline Gagal dan Berhasil
+Mahasiswa wajib membuat satu kegagalan terkontrol untuk membuktikan fungsi pipeline sebagai quality gate.
+6.	Membuat perubahan yang menyebabkan test gagal, syntax error, dependency hilang, atau output fungsi tidak sesuai.
+7.	Melakukan commit dan push ke GitHub.
+8.	Menunjukkan GitHub Actions berstatus gagal dan membaca log error.
+9.	Memperbaiki kesalahan.
+10.	Melakukan commit dan push kembali.
+11.	Menunjukkan pipeline berstatus berhasil.
+6. Hubungan dengan Materi Pertemuan
+Pertemuan	Materi	Implementasi dalam Tugas
+11	Docker dalam Cloud Computing	Instalasi Docker, hello-world, Dockerfile, build image, run container, dan port mapping.
+12	Container Orchestration dalam Cloud Computing	Docker Compose, definisi service, restart policy, pengelolaan service secara deklaratif, serta opsi aplikasi dan database.
+13	CI/CD dan Otomatisasi Pipeline	GitHub repository, automated testing, GitHub Actions, pipeline gagal, pipeline berhasil, dan Docker build otomatis.
+7. Luaran yang Dikumpulkan
+•	Link repository GitHub yang dapat diakses dosen.
+•	Link workflow GitHub Actions yang gagal.
+•	Link workflow GitHub Actions yang berhasil.
+•	Laporan praktikum dalam format PDF, 6-10 halaman.
+•	Video demonstrasi berdurasi 5-7 menit.
+•	Link aplikasi online bersifat opsional dan bukan syarat wajib.
+8. Struktur Laporan
+Bagian	Isi Minimal
+Halaman Judul	Judul tugas, nama, NIM, kelas, mata kuliah, dan tahun akademik.
+Bab 1 Pendahuluan	Latar belakang, tujuan, dan hubungan Docker, orkestrasi, serta CI/CD.
+Bab 2 Deskripsi Aplikasi	Nama aplikasi, fungsi, teknologi, dan struktur folder.
+Bab 3 Implementasi Docker	Instalasi, Dockerfile, build image, dan run container.
+Bab 4 Implementasi Docker Compose	Isi Compose, service, dan hasil docker compose ps.
+Bab 5 Implementasi CI/CD	Automated test, workflow, pipeline gagal, dan pipeline berhasil.
+Bab 6 Kesimpulan	Hasil, kendala, solusi, serta manfaat otomatisasi.
+9. Ketentuan Video Demonstrasi
+Video berdurasi 5-7 menit dan memperlihatkan proses berikut:
+1.	Identitas mahasiswa atau anggota kelompok.
+2.	Hasil docker --version dan docker compose version.
+3.	Docker Desktop atau Docker Engine dalam kondisi aktif.
+4.	Struktur repository dan file utama.
+5.	Proses menjalankan Docker Compose.
+6.	Aplikasi dapat diakses melalui browser atau endpoint.
+7.	Pipeline GitHub Actions yang gagal.
+8.	Pipeline GitHub Actions yang berhasil.
+9.	Penjelasan hubungan Docker, Docker Compose, dan CI/CD.
+10. Bukti Wajib
+No.	Bukti	Cara Verifikasi
+1	Docker terinstal	docker --version
+2	Docker Compose tersedia	docker compose version
+3	Hello World berjalan	docker run hello-world
+4	Docker image berhasil dibuat	docker images
+5	Container berjalan	docker ps
+6	Aplikasi dapat diakses	Browser, curl, atau API client
+7	Compose berjalan	docker compose ps
+8	Repository GitHub	Link aktif dan riwayat commit
+9	Pipeline gagal	Link GitHub Actions dan log error
+10	Pipeline berhasil	Link GitHub Actions dan log test/build
+11. Format Pengumpulan
+Nama:
+NIM:
+Kelas:
+Nama aplikasi:
+
+Link Repository GitHub:
+Link Pipeline Gagal:
+Link Pipeline Berhasil:
+Link Video Demonstrasi:
+Link Aplikasi Online (opsional):
+
+Nama file laporan: NIM_Nama_TugasPraktikumCloud.pdf
+12. Rubrik Penilaian
+Komponen	Indikator	Bobot
+Instalasi dan verifikasi Docker	Docker dan Compose tersedia; hello-world berhasil.	10%
+Aplikasi dapat dijalankan	Aplikasi lokal dan hasil container dapat diakses.	10%
+Dockerfile dan image	Dockerfile benar dan image berhasil dibangun.	15%
+Container berjalan	Container aktif, port benar, dan log tidak menunjukkan error kritis.	10%
+Docker Compose	Service dapat dikelola melalui Compose.	15%
+Automated testing	Minimal satu test berjalan dan relevan.	10%
+GitHub Actions	Workflow otomatis menjalankan test dan Docker build.	15%
+Simulasi gagal dan berhasil	Tersedia bukti pipeline gagal serta pipeline berhasil setelah perbaikan.	10%
+Dokumentasi dan penjelasan	Laporan, README, video, dan penjelasan runtut.	5%
+Total		100%
+13. Nilai Tambahan
+Nilai tambahan dapat diberikan apabila mahasiswa menerapkan salah satu atau lebih fitur berikut tanpa mengganggu fungsi utama:
+•	Menggunakan dua service atau lebih.
+•	Menggunakan database dan persistent volume.
+•	Menambahkan health check.
+•	Menggunakan GitHub Secrets secara tepat.
+•	Memberikan tag image berdasarkan versi atau commit SHA.
+•	Mempublikasikan image ke Docker Hub atau GitHub Container Registry.
+•	Menerapkan reverse proxy atau load balancing sederhana.
+14. Pembagian Waktu Pertemuan 3 SKS
+Durasi	Kegiatan	Target
+20 menit	Penjelasan tugas dan verifikasi Docker	Docker siap digunakan.
+25 menit	Menyiapkan aplikasi dan repository	Aplikasi lokal berjalan dan repository tersedia.
+35 menit	Dockerfile, build image, dan run container	Aplikasi berjalan dalam container.
+30 menit	Docker Compose	Service dapat dikelola secara deklaratif.
+25 menit	Automated test dan GitHub Actions	Pipeline dapat dijalankan.
+15 menit	Simulasi gagal, perbaikan, dan refleksi	Tersedia bukti gagal dan berhasil.
+15. Catatan Penting
+•	Mahasiswa tidak perlu membuat aplikasi yang kompleks. Aplikasi sederhana sudah memadai selama integrasi Docker, Docker Compose, dan CI/CD dapat dibuktikan.
+•	Kegagalan pipeline harus dibuat secara terkontrol dan kemudian diperbaiki.
+•	Jangan menuliskan password, token, private key, atau credential lain secara langsung di repository.
+•	Apabila bekerja dalam kelompok, setiap anggota wajib memahami seluruh alur dan dapat menjelaskan bagian yang dikerjakan.
+•	Dosen berhak meminta demonstrasi singkat atau perubahan kecil secara langsung untuk memverifikasi pemahaman mahasiswa.

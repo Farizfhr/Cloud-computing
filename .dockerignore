@@ -1,0 +1,52 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# GitHub Actions
+.github
+
+# Node modules and build artifacts
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Laravel
+vendor
+.env
+.env.production
+.env.local
+bootstrap/cache/*
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/testing/*
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+phpunit.xml
+phpunit.xml.dist
+coverage
+*.log
+
+# Documentation
+README.md
+CHANGELOG.md
+LICENSE
+
+# Composer
+composer.phar

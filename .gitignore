@@ -1,0 +1,13 @@
+/vendor
+/node_modules
+.env
+.phpunit.result.cache
+
+/Logs
+/faris-portfolio
+/public/storage
+
+*.vdi
+*.vbox
+*.vbox-prev
+Unattended-*
