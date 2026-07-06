@@ -8,7 +8,7 @@ Route::get('/', [PortfolioController::class, 'index'])->name('portfolio');
 // Health check endpoint for Docker healthcheck and monitoring
 Route::get('/health', function () {
     return response()->json([
-        'status' => 'healthy',
+        'status' => 'error',
         'timestamp' => now()->toISOString(),
         'version' => '1.0.0'
     ]);
